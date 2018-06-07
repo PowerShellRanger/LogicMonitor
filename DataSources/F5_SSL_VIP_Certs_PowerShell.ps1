@@ -9,19 +9,6 @@ $f5Pass = '##f5.pass##'
 $securePass = ConvertTo-SecureString -String $f5Pass -AsPlainText -Force
 $credential = New-Object -TypeName System.Management.Automation.PSCredential ($f5User, $securePass)
 
-Add-Type @"
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    public class TrustAllCertsPolicy : ICertificatePolicy {
-        public bool CheckValidationResult(
-            ServicePoint srvPoint, X509Certificate certificate,
-            WebRequest request, int certificateProblem) {
-            return true;
-        }
-    }
-"@
-[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
-
 $token = New-F5RestApiToken -F5Name $hostname -Credential $credential -Confirm:$false -ErrorAction Stop
 $sslCerts = Get-F5SslCertificate -F5Name $hostname -Token $token.Token -GetAllCertificates
 
@@ -46,19 +33,6 @@ $date = Get-Date
 # build a credential object
 $securePass = ConvertTo-SecureString -String $f5Pass -AsPlainText -Force
 $credential = New-Object -TypeName System.Management.Automation.PSCredential ($f5User, $securePass)
-
-Add-Type @"
-    using System.Net;
-    using System.Security.Cryptography.X509Certificates;
-    public class TrustAllCertsPolicy : ICertificatePolicy {
-        public bool CheckValidationResult(
-            ServicePoint srvPoint, X509Certificate certificate,
-            WebRequest request, int certificateProblem) {
-            return true;
-        }
-    }
-"@
-[System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
 
 $token = New-F5RestApiToken -F5Name $hostname -Credential $credential -Confirm:$false -ErrorAction Stop
 $sslCert = Get-F5SslCertificate -F5Name $hostname -Token $token.Token -CertificateName $certificateName
