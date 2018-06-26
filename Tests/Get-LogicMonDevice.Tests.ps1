@@ -115,20 +115,20 @@ InModuleScope -ModuleName $moduleName {
             $cmdlet = Get-Command -Name $cmdletName
 
             It "Should throw when mandatory parameters are not provided" {                
-                $cmdlet.Parameters.ComputerName.Attributes.Mandatory | should be $true       
+                $cmdlet.Parameters.DeviceName.Attributes.Mandatory | should be $true       
             }         
         }
 
         Context "Testing function returns data from ProdLogicMon" {
             
-            Mock -CommandName New-LogicMonHeader -MockWith {return $mockLogicMonHeader} 
-            Mock -CommandName Invoke-RestMethod -MockWith {return $testLogicMonData} 
+            Mock -CommandName New-LogicMonHeader -MockWith {return $mockLogicMonHeader} -Verifiable
+            Mock -CommandName Invoke-RestMethod -MockWith {return $testLogicMonData} -Verifiable
             
-            $testObject = Get-LogicMonDevice -ComputerName $testComputerName -AccessKey 'Some Prod Access Key' -AccessId 'Some Prod Access ID' -Company 'SomeCompany'
+            $testObject = Get-LogicMonDevice -DeviceName $testComputerName -AccessKey 'Some Prod Access Key' -AccessId 'Some Prod Access ID' -Company 'SomeCompany'
 
             It "Assert each mock called 1 time" {                
-                Assert-MockCalled -CommandName New-LogicMonHeader -Times 1            
-                Assert-MockCalled -CommandName Invoke-RestMethod -Times 1
+                Assert-MockCalled -CommandName New-LogicMonHeader -Times 1 -Scope Context
+                Assert-MockCalled -CommandName Invoke-RestMethod -Times 1 -Scope Context
             }        
             It "Should return an object with a name parameter" {
                 $testObject.name | Should Be $testLogicMonData.data.items.name
