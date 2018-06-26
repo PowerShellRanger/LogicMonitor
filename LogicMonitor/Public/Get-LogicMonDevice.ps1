@@ -34,7 +34,7 @@ function Get-LogicMonDevice
     }
     process
     {
-        foreach ($server in $DeviceName)
+        foreach ($server in $DeviceName)  
         {                    
             Write-Verbose "Building URL for Invoke-RestMethod cmdlet."
             $url = "https://" + $Company + ".logicmonitor.com/santaba/rest" + "/device/devices?filter=displayName~$server"
