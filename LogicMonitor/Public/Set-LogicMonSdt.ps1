@@ -103,7 +103,7 @@ function Set-LogicMonSdt
         {
             if ($PSCmdlet.Shouldprocess("Scheduled Down Time for $server will be set to $Duration."))
             {
-                $device = Get-LogicMonDevice -ComputerName $server -AccessKey $AccessKey -AccessId $AccessId -Company $Company
+                $device = Get-LogicMonDevice -DeviceName $server -AccessKey $AccessKey -AccessId $AccessId -Company $Company
 
                 if (-not $device.DeviceId)
                 {
