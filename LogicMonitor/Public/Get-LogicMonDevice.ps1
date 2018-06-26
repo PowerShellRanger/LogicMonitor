@@ -15,18 +15,18 @@ function Get-LogicMonDevice
     (
         # Name of device
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [string[]]$ComputerName,
+        [string[]]$DeviceName,
 
         # Access Key from LogicMon for your user account
-        [parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string]$AccessKey,
 
         # Access ID from LogicMon for your user account
-        [parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string]$AccessId,
 
         # LogicMon Company Name
-        [parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string]$Company
     )
     begin
