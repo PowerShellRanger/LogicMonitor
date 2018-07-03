@@ -2,56 +2,79 @@ function New-LogicMonHeader
 {
     <#
     .Synopsis
-       New Logic Monitor Header 
+        New LogicMonitor Header 
     .DESCRIPTION
-       Use this function to build a new Logic Monitor header to authenticate with the Rest API
+        Use this function to build a header to authenticate with LogicMonitor's Rest API
     .EXAMPLE
-       $header = New-LogicMonHeader -AccessKey "AccessKey" -AccessId "AccessId" -Verb Get -Verbose
+        New-LogicMonHeader -AccessKey 'AccessKey' -AccessId 'AccessId' -Verb Get -Verbose       
+
+        Description
+        -----------
+        Build a header to authenticate with LogicMonitor's Rest Api. 
+        Access Key and Id come from LogicMonitor's portal. 
     .EXAMPLE
        
     #>
+    [OutputType(
+        [LogicMonApiHeader]        
+    )]
     [CmdletBinding()]
     param
-    (                
+    (
         # Access Key from LogicMon for your user account
-        [parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory, 
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName
+        )]
         [string]$AccessKey,
 
         # Access ID from LogicMon for your user account
-        [parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory, 
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName
+        )]
         [string]$AccessId,        
         
         # HTTP Verb (Get, Post, Put, Delete)
-        [parameter(Mandatory)]
+        [Parameter(Mandatory)]
         [ValidateSet("Get", "Post", "Put", "Delete")]
-        [string]$Verb
+        [string]$Verb,
+
+        # LogicMon Id of device
+        [Parameter(            
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName            
+        )]
+        [int]$DeviceId,
+
+        # LogicMon Data for Puts
+        [Parameter(            
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName            
+        )]
+        [hashtable]$Data
     )
     begin
     {
     }
     process
-    {        
-        Write-Verbose "Defining account info for LogicMon."        
-        $httpVerb = $Verb.ToUpper()
+    {                        
+        if ($PSBoundParameters['Id'])
+        {            
+            Write-Verbose "Generating new header for ID: $id."                    
+            return [LogicMonApiHeader]::New($id, $AccessKey, $AccessId, $Verb)
+        }
 
-        Write-Verbose "Getting current time in milliseconds."
-        $epoch = [Math]::Round((New-TimeSpan -start (Get-Date -Date "1/1/1970") -end (Get-Date).ToUniversalTime()).TotalMilliseconds)
-        $requestVars = $httpVerb + $epoch + "/device/devices"
-        
-        Write-Verbose "Constructing signature"
-        $hmac = New-Object System.Security.Cryptography.HMACSHA256
-        $hmac.Key = [Text.Encoding]::UTF8.GetBytes($AccessKey)
-        $signatureBytes = $hmac.ComputeHash([Text.Encoding]::UTF8.GetBytes($requestVars))
-        $signatureHex = [System.BitConverter]::ToString($signatureBytes) -replace '-'
-        $signature = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($signatureHex.ToLower()))
-        
-        Write-Verbose "Constructing header"
-        $auth = 'LMv1 ' + $AccessId + ':' + $signature + ':' + $epoch
-        $header = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-        $header.Add("Authorization", $auth)
-        $header.Add("Content-Type", 'application/json')
-        
-        $header
+        if ($PSBoundParameters['Data'])
+        {   
+            Write-Verbose "Generating new header with data injected."                                                 
+            return [LogicMonApiHeader]::New($Data, $AccessKey, $AccessId, $Verb)            
+        }
+
+        Write-Verbose 'Generating new header'
+        [LogicMonApiHeader]::New($AccessKey, $AccessId, $Verb)
     }
     end
     {
