@@ -38,10 +38,12 @@ class LogicMonDevice
         foreach ($name in $deviceName)
         {
             $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices?filter=displayName~$name"
+            $httpVerb = 'GET'
+            $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb).Header
 
             $splatGetDeviceByName = @{
-                Headers = [LogicMonApiHeader]::New($accessKey, $accessId, 'GET').Header
-                Method  = 'GET'
+                Headers = $headers
+                Method  = $httpVerb
                 Uri     = $uri
             }
             Write-Verbose "Invoke Rest Method to: $uri"
@@ -68,9 +70,10 @@ class LogicMonDevice
         {
             $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices/$id"
             $httpVerb = 'GET'
+            $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb -DeviceId $id).Header
 
             $splatGetDeviceById = @{
-                Headers = [LogicMonApiHeader]::New($id, $accessKey, $accessId, $httpVerb).Header
+                Headers = $headers
                 Method  = $httpVerb
                 Uri     = $uri
             }
@@ -101,9 +104,10 @@ class LogicMonDevice
             preferredCollectorId = $this.PreferredCollectorId
             hostGroupIds         = $this.HostGroupIds
         }
+        $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb -Data $body).Header
 
         $splatCreateDevice = @{
-            Headers     = [LogicMonApiHeader]::New($body, $accessKey, $accessId, $httpVerb).Header                        
+            Headers     = $headers
             Method      = $httpVerb
             ContentType = 'application/json'
             Uri         = $uri
