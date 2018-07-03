@@ -2,31 +2,72 @@ function Get-LogicMonDevice
 {
     <#
     .Synopsis
-       Get a device from Logic Monitor.
+        Get a device from LogicMonitor.
     .DESCRIPTION
-       Use this function to get devices from Logic Monitor.
+        Use this function to get devices from LogicMonitor.
     .EXAMPLE
-       
+        Get-LogicMonDevice -DeviceName 'foo' -AccessKey 'AccessKey -AccessId 'AccessId -Company 'someCompany' -Verbose
+
+        Description
+        -----------
+        Get a device from LogicMonitor by name. 
+        Access Key and Id come from LogicMonitor's portal. 
     .EXAMPLE
-       
+        Get-LogicMonDevice -DeviceId 1234 -AccessKey 'AccessKey -AccessId 'AccessId -Company 'someCompany' -Verbose
+
+        Description
+        -----------
+        Get a device from LogicMonitor by Id. 
+        Access Key and Id come fromLogicMonitor's portal. 
     #>
-    [CmdletBinding()]
+    [OutputType(
+        [LogicMonApiDevice],
+        [LogicMonApiDevice[]]
+    )]
+    [CmdletBinding(
+        DefaultParameterSetName = 'GetDeviceByName'
+    )]
     param
     (
         # Name of device
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory,
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName,
+            ParameterSetName = 'GetDeviceByName'
+        )]
         [string[]]$DeviceName,
 
+        # LogicMon Id of device
+        [Parameter(            
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName,
+            ParameterSetName = 'GetDeviceById'
+        )]
+        [int[]]$DeviceId,
+
         # Access Key from LogicMon for your user account
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory, 
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName
+        )]
         [string]$AccessKey,
 
         # Access ID from LogicMon for your user account
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory, 
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName
+        )]
         [string]$AccessId,
 
         # LogicMon Company Name
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [Parameter(
+            Mandatory, 
+            ValueFromPipeline, 
+            ValueFromPipelineByPropertyName
+        )]
         [string]$Company
     )
     begin
@@ -34,29 +75,26 @@ function Get-LogicMonDevice
     }
     process
     {
-        foreach ($server in $DeviceName)  
-        {                    
-            Write-Verbose "Building URL for Invoke-RestMethod cmdlet."
-            $url = "https://" + $Company + ".logicmonitor.com/santaba/rest" + "/device/devices?filter=displayName~$server"
-            
-            Write-Verbose "Building a new LogicMon header."
-            $header = New-LogicMonHeader -AccessKey $AccessKey -AccessId $AccessId -Verb Get            
-            
-            try
-            {
-                Write-Verbose "Trying to get data from LogicMon's rest API."               
-                $response = Invoke-RestMethod -Uri $url -Method Get -Header $header -ErrorAction Stop
+        $errorAction = $ErrorActionPreference        
+        if ($PSBoundParameters["ErrorAction"])
+        {
+            $errorAction = $PSBoundParameters["ErrorAction"]
+        }
+        
+        if ($PSBoundParameters['DeviceName'])
+        {
+            foreach ($server in $DeviceName)  
+            {                    
+                [LogicMonApiDevice]::GetDeviceByName($server, $AccessKey, $AccessId, $Company)
             }
-            catch
-            {
-                throw $_
-            }            
-            
-            [PSCustomObject] @{
-                Name      = $($response.data.items.name)
-                DeviceId  = $($response.data.items.id)
-                Company   = $Company
-            }            
+        }
+
+        if ($PSBoundParameters['DeviceId'])
+        {
+            foreach ($id in $DeviceId)  
+            {                    
+                [LogicMonApiDevice]::GetDeviceById($id, $AccessKey, $AccessId, $Company)
+            }
         }
     }
     end
