@@ -1,4 +1,4 @@
-class LogicMonDevice
+class LogicMonApiDevice
 {
     # Device Id
     [int]$Id
@@ -24,7 +24,7 @@ class LogicMonDevice
     # Device System Properties
     [psobject]$SystemProperties
 
-    LogicMonDevice ([string]$name, [string]$displayName, [int]$preferredCollectorId, [int[]]$hostGroupIds)
+    LogicMonApiDevice ([string]$name, [string]$displayName, [int]$preferredCollectorId, [int[]]$hostGroupIds)
     {
         $this.Name = $name
         $this.DisplayName = $displayName
@@ -32,7 +32,7 @@ class LogicMonDevice
         $this.HostGroupIds = $hostGroupIds
     }
 
-    static [LogicMonDevice[]] GetDeviceByName([string[]]$deviceName, [string]$accessKey, [string]$accessId, [string]$company)
+    static [LogicMonApiDevice[]] GetDeviceByName([string[]]$deviceName, [string]$accessKey, [string]$accessId, [string]$company)
     {        
         $devices = New-Object 'System.Collections.Generic.List[PSCustomObject]'
         foreach ($name in $deviceName)
@@ -51,7 +51,7 @@ class LogicMonDevice
 
             $data = $response.data.items
 
-            $device = [LogicMonDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
+            $device = [LogicMonApiDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
             
             $device.Id = $data.id
             $device.DeviceType = $data.deviceType
@@ -63,7 +63,7 @@ class LogicMonDevice
         return $devices
     }
 
-    static [LogicMonDevice[]] GetDeviceById([int[]]$deviceId, [string]$accessKey, [string]$accessId, [string]$company)
+    static [LogicMonApiDevice[]] GetDeviceById([int[]]$deviceId, [string]$accessKey, [string]$accessId, [string]$company)
     {        
         $devices = New-Object 'System.Collections.Generic.List[PSCustomObject]'
         foreach ($id in $deviceId)
@@ -82,7 +82,7 @@ class LogicMonDevice
 
             $data = $response.data
 
-            $device = [LogicMonDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
+            $device = [LogicMonApiDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
             
             $device.Id = $data.id
             $device.DeviceType = $data.deviceType
