@@ -74,25 +74,21 @@ function Get-LogicMonDevice
     {
     }
     process
-    {
-        $errorAction = $ErrorActionPreference        
-        if ($PSBoundParameters["ErrorAction"])
-        {
-            $errorAction = $PSBoundParameters["ErrorAction"]
-        }
-        
+    {                
         if ($PSBoundParameters['DeviceName'])
         {
             foreach ($server in $DeviceName)  
-            {                    
+            {
+                Write-Verbose "Get Device by Name: $server."
                 [LogicMonApiDevice]::GetDeviceByName($server, $AccessKey, $AccessId, $Company)
             }
         }
 
         if ($PSBoundParameters['DeviceId'])
         {
-            foreach ($id in $DeviceId)  
+            foreach ($id in $DeviceId)
             {                    
+                Write-Verbose "Get Device by Id: $id."
                 [LogicMonApiDevice]::GetDeviceById($id, $AccessKey, $AccessId, $Company)
             }
         }
