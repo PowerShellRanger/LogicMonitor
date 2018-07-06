@@ -42,39 +42,20 @@ function New-LogicMonHeader
         [ValidateSet("Get", "Post", "Put", "Delete")]
         [string]$Verb,
 
-        # LogicMon Id of device
-        [Parameter(            
-            ValueFromPipeline, 
-            ValueFromPipelineByPropertyName            
-        )]
-        [int]$DeviceId,
-
         # LogicMon Data for Puts
         [Parameter(            
             ValueFromPipeline, 
             ValueFromPipelineByPropertyName            
         )]
-        [hashtable]$Data
+        [string]$Data
     )
     begin
     {
     }
     process
-    {                        
-        if ($PSBoundParameters['Id'])
-        {            
-            Write-Verbose "Generating new header for ID: $id."                    
-            return [LogicMonApiHeader]::New($id, $AccessKey, $AccessId, $Verb)
-        }
-
-        if ($PSBoundParameters['Data'])
-        {   
-            Write-Verbose "Generating new header with data injected."                                                 
-            return [LogicMonApiHeader]::New($Data, $AccessKey, $AccessId, $Verb)            
-        }
-
-        Write-Verbose 'Generating new header'
-        [LogicMonApiHeader]::New($AccessKey, $AccessId, $Verb)
+    {        
+        Write-Verbose "Generating new header with data injected."
+        [LogicMonApiHeader]::New($Data, $AccessKey, $AccessId, $Verb)
     }
     end
     {
