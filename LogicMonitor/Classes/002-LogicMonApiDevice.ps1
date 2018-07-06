@@ -19,17 +19,22 @@ class LogicMonApiDevice
     [int]$PreferredCollectorId
 
     # Host Group Ids
-    [int[]]$HostGroupIds
+    [string[]]$HostGroupIds
 
     # Device System Properties
     [psobject]$SystemProperties
 
-    LogicMonApiDevice ([string]$name, [string]$displayName, [int]$preferredCollectorId, [int[]]$hostGroupIds)
-    {
+    LogicMonApiDevice ([string]$name, [string]$displayName, [int]$preferredCollectorId, [string[]]$hostGroupIds)
+    {        
         $this.Name = $name
         $this.DisplayName = $displayName
         $this.PreferredCollectorId = $preferredCollectorId
         $this.HostGroupIds = $hostGroupIds
+        
+        if ([string]::IsNullOrEmpty($this.DisplayName))
+        {
+            $this.DisplayName = $name
+        }
     }
 
     static [LogicMonApiDevice[]] GetDeviceByName([string[]]$deviceName, [string]$accessKey, [string]$accessId, [string]$company)
@@ -39,7 +44,15 @@ class LogicMonApiDevice
         {
             $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices?filter=displayName~$name"
             $httpVerb = 'GET'
-            $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb).Header
+            $requestData = '/device/devices'
+
+            $splatNewLogicMonHeader = @{
+                AccessKey = $accessKey
+                AccessId  = $accessId
+                Verb      = $httpVerb
+                Data      = $requestData
+            }
+            $headers = (New-LogicMonHeader @splatNewLogicMonHeader).Header
 
             $splatGetDeviceByName = @{
                 Headers = $headers
@@ -70,7 +83,15 @@ class LogicMonApiDevice
         {
             $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices/$id"
             $httpVerb = 'GET'
-            $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb -DeviceId $id).Header
+            $requestData = "/device/devices/$id"
+            
+            $splatNewLogicMonHeader = @{
+                AccessKey = $accessKey
+                AccessId  = $accessId
+                Verb      = $httpVerb
+                Data      = $requestData
+            }
+            $headers = (New-LogicMonHeader @splatNewLogicMonHeader).Header
 
             $splatGetDeviceById = @{
                 Headers = $headers
@@ -94,7 +115,8 @@ class LogicMonApiDevice
         return $devices
     }
 
-    [void] Create([string]$accessKey, [string]$accessId, [string]$company)
+    <# TODO: This method is not working. Complains about invalid json body
+    [PSCustomObject] Create([string]$accessKey, [string]$accessId, [string]$company, [string]$errorAction)
     {
         $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices"
         $httpVerb = 'POST'
@@ -104,7 +126,15 @@ class LogicMonApiDevice
             preferredCollectorId = $this.PreferredCollectorId
             hostGroupIds         = $this.HostGroupIds
         }
-        $headers = (New-LogicMonApiHeader -AccessKey $accessKey -AccessId $accessId -Verb $httpVerb -Data $body).Header
+        $requestData = "$($body | ConvertTo-Json)/device/devices"
+        
+        $splatNewLogicMonHeader = @{
+            AccessKey = $accessKey
+            AccessId  = $accessId
+            Verb      = $httpVerb
+            Data      = $requestData
+        }
+        $headers = (New-LogicMonHeader @splatNewLogicMonHeader).Header
 
         $splatCreateDevice = @{
             Headers     = $headers
@@ -112,9 +142,10 @@ class LogicMonApiDevice
             ContentType = 'application/json'
             Uri         = $uri
             Body        = ($body | ConvertTo-Json)
-            ErrorAction = 'Stop'
-        }
+            ErrorAction = $errorAction
+        }        
         Write-Verbose "Invoke Rest Method to: $uri"
-        [void](Invoke-RestMethod @splatCreateDevice)
+        return Invoke-RestMethod @splatCreateDevice        
     }
+    #>
 }
