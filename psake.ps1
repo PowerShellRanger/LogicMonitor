@@ -13,7 +13,7 @@ function Invoke-TestFailure
         $PesterResults
     )
 
-    if ($TestType -eq 'Unit') 
+    if ($TestType -eq 'Unit')
     {
         $errorID = 'UnitTestFailure'
     }
@@ -32,7 +32,7 @@ function Invoke-TestFailure
     $errorRecord = New-Object -TypeName System.Management.Automation.ErrorRecord -ArgumentList $exception, $errorID, $errorCategory, $null
 
     Write-Output "##vso[task.logissue type=error]Exception: $errorMessage"
-    throw $errorRecord    
+    throw $errorRecord
 }
 
 function Import-PsClass
@@ -40,7 +40,7 @@ function Import-PsClass
     $path = "$PSScriptRoot\$env:BUILD_REPOSITORY_NAME\Classes"
     if (Test-Path -Path $path)
     {
-        $classes = Get-ChildItem -Path $path -Filter '*.ps1' 
+        $classes = Get-ChildItem -Path $path -Filter '*.ps1'
         if ($classes)
         {
             "Classes are a pain, so we must dot source them first..."
@@ -50,33 +50,33 @@ function Import-PsClass
                 . $($class.FullName)
             }
         }
-    }    
+    }
 }
 
 FormatTaskName "--------------- {0} ---------------"
 
 Properties {
-    # psake makes variables declared here available in other scriptblocks    
+    # psake makes variables declared here available in other scriptblocks
     $testsPath = "$PSScriptRoot\Tests"
-    $testResultsPath = "$TestsPath\Results"        
+    $testResultsPath = "$TestsPath\Results"
 }
 
 Task Default -Depends ScriptAnalysis, UnitTests, Build, Clean
 
 Task Init {
     "Build System Details:"
-    $env:BUILD_REPOSITORY_NAME    
+    $env:BUILD_REPOSITORY_NAME
     "`n"
 }
 
-Task ScriptAnalysis -Depends Init {        
+Task ScriptAnalysis -Depends Init {
     . Import-PsClass
 
     "Starting script analysis..."
     Invoke-ScriptAnalyzer -Path "$PSScriptRoot\$env:BUILD_REPOSITORY_NAME\*\*.ps1"
 }
 
-Task UnitTests -Depends ScriptAnalysis {        
+Task UnitTests -Depends ScriptAnalysis {
     # Make sure Test Result location exists
     New-Item $testResultsPath -ItemType Directory -Force
 
@@ -84,10 +84,10 @@ Task UnitTests -Depends ScriptAnalysis {
 
     "Starting unit tests..."
     $pesterResults = Invoke-Pester -Path "$testsPath" -OutputFile "$testResultsPath\UnitTest.xml" -OutputFormat NUnitXml -PassThru
-    
+
     if ($pesterResults.FailedCount)
     {
-        Invoke-TestFailure -TestType Unit -PesterResults $pesterResults        
+        Invoke-TestFailure -TestType Unit -PesterResults $pesterResults
     }
 }
 
@@ -98,7 +98,7 @@ Task Build -Depends UnitTests {
 
     # Get public functions to export
     $functions = Get-ChildItem "$PSScriptRoot\$env:BUILD_REPOSITORY_NAME\Public\*.ps1" | Select-Object -ExpandProperty BaseName
-    
+
     # Update the manifest file
     $splatUpdateModuleManifest = @{
         Path              = "$PSScriptRoot\$env:BUILD_REPOSITORY_NAME\*.psd1"
@@ -109,8 +109,8 @@ Task Build -Depends UnitTests {
 }
 
 Task Clean {
-    "Starting cleaning environment..."        
-    
-    # Remove Test Results from previous runs    
+    "Starting cleaning environment..."
+
+    # Remove Test Results from previous runs
     Remove-Item "$TestResultsPath\*.xml"
 }

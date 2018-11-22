@@ -9,8 +9,8 @@ $f5Pass = '##f5.pass##'
 $securePass = ConvertTo-SecureString -String $f5Pass -AsPlainText -Force
 $credential = New-Object -TypeName System.Management.Automation.PSCredential ($f5User, $securePass)
 
-$session = New-F5Session -F5Name $hostname -Credential $credential -ErrorAction Stop
-$sslCerts = Get-F5SslCertificate -F5Name $hostname -Token $session.Token -GetAllCertificates
+$token = New-F5RestApiToken -F5Name $hostname -Credential $credential -Confirm:$false -ErrorAction Stop
+$sslCerts = Get-F5SslCertificate -F5Name $hostname -Token $token.Token -GetAllCertificates
 
 if ($sslCerts)
 {
@@ -34,8 +34,8 @@ $date = Get-Date
 $securePass = ConvertTo-SecureString -String $f5Pass -AsPlainText -Force
 $credential = New-Object -TypeName System.Management.Automation.PSCredential ($f5User, $securePass)
 
-New-F5Session -F5Name $hostname -Credential $credential -ErrorAction Stop
-$sslCert = Get-F5SslCertificate -F5Name $hostname -Token $Script:F5Session.Token -CertificateName $certificateName
+$token = New-F5RestApiToken -F5Name $hostname -Credential $credential -Confirm:$false -ErrorAction Stop
+$sslCert = Get-F5SslCertificate -F5Name $hostname -Token $token.Token -CertificateName $certificateName
 
 $epoch = New-Object System.DateTime (1970, 1, 1, 0, 0, 0)
 $expirationDate = $epoch.AddSeconds($sslCert.expirationDate)

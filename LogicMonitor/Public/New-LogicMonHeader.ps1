@@ -2,50 +2,50 @@ function New-LogicMonHeader
 {
     <#
     .Synopsis
-        New LogicMonitor Header 
+        New LogicMonitor Header
     .DESCRIPTION
         Use this function to build a header to authenticate with LogicMonitor's Rest API
     .EXAMPLE
-        New-LogicMonHeader -AccessKey 'AccessKey' -AccessId 'AccessId' -Verb Get -Verbose       
+        New-LogicMonHeader -AccessKey 'AccessKey' -AccessId 'AccessId' -Verb Get -Verbose
 
         Description
         -----------
-        Build a header to authenticate with LogicMonitor's Rest Api. 
-        Access Key and Id come from LogicMonitor's portal. 
+        Build a header to authenticate with LogicMonitor's Rest Api.
+        Access Key and Id come from LogicMonitor's portal.
     .EXAMPLE
-       
+
     #>
     [OutputType(
-        [LogicMonApiHeader]        
+        [LogicMonApiHeader]
     )]
     [CmdletBinding()]
     param
     (
         # Access Key from LogicMon for your user account
         [Parameter(
-            Mandatory, 
-            ValueFromPipeline, 
+            Mandatory,
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
         [string]$AccessKey,
 
         # Access ID from LogicMon for your user account
         [Parameter(
-            Mandatory, 
-            ValueFromPipeline, 
+            Mandatory,
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
-        [string]$AccessId,        
-        
+        [string]$AccessId,
+
         # HTTP Verb (Get, Post, Put, Delete)
         [Parameter(Mandatory)]
         [ValidateSet("Get", "Post", "Put", "Delete")]
         [string]$Verb,
 
         # LogicMon Data for Puts
-        [Parameter(            
-            ValueFromPipeline, 
-            ValueFromPipelineByPropertyName            
+        [Parameter(
+            ValueFromPipeline,
+            ValueFromPipelineByPropertyName
         )]
         [string]$Data
     )
@@ -53,7 +53,7 @@ function New-LogicMonHeader
     {
     }
     process
-    {        
+    {
         Write-Verbose "Generating new header with data injected."
         [LogicMonApiHeader]::New($Data, $AccessKey, $AccessId, $Verb)
     }

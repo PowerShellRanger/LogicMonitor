@@ -25,12 +25,12 @@ class LogicMonApiDevice
     [psobject]$SystemProperties
 
     LogicMonApiDevice ([string]$name, [string]$displayName, [int]$preferredCollectorId, [string[]]$hostGroupIds)
-    {        
+    {
         $this.Name = $name
         $this.DisplayName = $displayName
         $this.PreferredCollectorId = $preferredCollectorId
         $this.HostGroupIds = $hostGroupIds
-        
+
         if ([string]::IsNullOrEmpty($this.DisplayName))
         {
             $this.DisplayName = $name
@@ -38,7 +38,7 @@ class LogicMonApiDevice
     }
 
     static [LogicMonApiDevice[]] GetDeviceByName([string[]]$deviceName, [string]$accessKey, [string]$accessId, [string]$company)
-    {        
+    {
         $devices = New-Object 'System.Collections.Generic.List[PSCustomObject]'
         foreach ($name in $deviceName)
         {
@@ -65,7 +65,7 @@ class LogicMonApiDevice
             $data = $response.data.items
 
             $device = [LogicMonApiDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
-            
+
             $device.Id = $data.id
             $device.DeviceType = $data.deviceType
             $device.CurrentCollectorId = $data.currentCollectorId
@@ -77,14 +77,14 @@ class LogicMonApiDevice
     }
 
     static [LogicMonApiDevice[]] GetDeviceById([int[]]$deviceId, [string]$accessKey, [string]$accessId, [string]$company)
-    {        
+    {
         $devices = New-Object 'System.Collections.Generic.List[PSCustomObject]'
         foreach ($id in $deviceId)
         {
             $uri = "https://$company.logicmonitor.com/santaba/rest/device/devices/$id"
             $httpVerb = 'GET'
             $requestData = "/device/devices/$id"
-            
+
             $splatNewLogicMonHeader = @{
                 AccessKey = $accessKey
                 AccessId  = $accessId
@@ -104,7 +104,7 @@ class LogicMonApiDevice
             $data = $response.data
 
             $device = [LogicMonApiDevice]::New($data.name, $data.displayName, $data.preferredCollectorId, $data.hostGroupIds)
-            
+
             $device.Id = $data.id
             $device.DeviceType = $data.deviceType
             $device.CurrentCollectorId = $data.currentCollectorId
@@ -127,7 +127,7 @@ class LogicMonApiDevice
             hostGroupIds         = $this.HostGroupIds
         }
         $requestData = "$($body | ConvertTo-Json)/device/devices"
-        
+
         $splatNewLogicMonHeader = @{
             AccessKey = $accessKey
             AccessId  = $accessId
@@ -143,9 +143,9 @@ class LogicMonApiDevice
             Uri         = $uri
             Body        = ($body | ConvertTo-Json)
             ErrorAction = $errorAction
-        }        
+        }
         Write-Verbose "Invoke Rest Method to: $uri"
-        return Invoke-RestMethod @splatCreateDevice        
+        return Invoke-RestMethod @splatCreateDevice
     }
     #>
 }

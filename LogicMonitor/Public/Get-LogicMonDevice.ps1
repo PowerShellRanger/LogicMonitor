@@ -10,15 +10,15 @@ function Get-LogicMonDevice
 
         Description
         -----------
-        Get a device from LogicMonitor by name. 
-        Access Key and Id come from LogicMonitor's portal. 
+        Get a device from LogicMonitor by name.
+        Access Key and Id come from LogicMonitor's portal.
     .EXAMPLE
         Get-LogicMonDevice -DeviceId 1234 -AccessKey 'AccessKey -AccessId 'AccessId -Company 'someCompany' -Verbose
 
         Description
         -----------
-        Get a device from LogicMonitor by Id. 
-        Access Key and Id come fromLogicMonitor's portal. 
+        Get a device from LogicMonitor by Id.
+        Access Key and Id come fromLogicMonitor's portal.
     #>
     [OutputType(
         [LogicMonApiDevice],
@@ -32,15 +32,15 @@ function Get-LogicMonDevice
         # Name of device
         [Parameter(
             Mandatory,
-            ValueFromPipeline, 
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName,
             ParameterSetName = 'GetDeviceByName'
         )]
         [string[]]$DeviceName,
 
         # LogicMon Id of device
-        [Parameter(            
-            ValueFromPipeline, 
+        [Parameter(
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName,
             ParameterSetName = 'GetDeviceById'
         )]
@@ -48,24 +48,24 @@ function Get-LogicMonDevice
 
         # Access Key from LogicMon for your user account
         [Parameter(
-            Mandatory, 
-            ValueFromPipeline, 
+            Mandatory,
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
         [string]$AccessKey,
 
         # Access ID from LogicMon for your user account
         [Parameter(
-            Mandatory, 
-            ValueFromPipeline, 
+            Mandatory,
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
         [string]$AccessId,
 
         # LogicMon Company Name
         [Parameter(
-            Mandatory, 
-            ValueFromPipeline, 
+            Mandatory,
+            ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
         [string]$Company
@@ -74,10 +74,10 @@ function Get-LogicMonDevice
     {
     }
     process
-    {                
+    {
         if ($PSBoundParameters['DeviceName'])
         {
-            foreach ($server in $DeviceName)  
+            foreach ($server in $DeviceName)
             {
                 Write-Verbose "Get Device by Name: $server."
                 [LogicMonApiDevice]::GetDeviceByName($server, $AccessKey, $AccessId, $Company)
@@ -87,7 +87,7 @@ function Get-LogicMonDevice
         if ($PSBoundParameters['DeviceId'])
         {
             foreach ($id in $DeviceId)
-            {                    
+            {
                 Write-Verbose "Get Device by Id: $id."
                 [LogicMonApiDevice]::GetDeviceById($id, $AccessKey, $AccessId, $Company)
             }

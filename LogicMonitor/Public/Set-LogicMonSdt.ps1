@@ -5,7 +5,7 @@ function Set-LogicMonSdt
         Set Scheduled Down Time for Servers in LogicMon's portal.
     .DESCRIPTION
         Use this function to set SDT's for one or multiple servers.
-    .EXAMPLE        
+    .EXAMPLE
         $splatLogicMonSdt = @{
             ComputerName = 'foo'
             Duration     = 4
@@ -21,9 +21,9 @@ function Set-LogicMonSdt
         Description
         -----------
         Schedule Down Time in LogicMon for device foo. Your access key and access
-        id will come from the LogicMon portal. 
+        id will come from the LogicMon portal.
     .EXAMPLE
-        
+
     #>
     [CmdletBinding(
         SupportsShouldprocess,
@@ -32,7 +32,7 @@ function Set-LogicMonSdt
     (
         # Name of device
         [Parameter(
-            Mandatory, 
+            Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
@@ -40,15 +40,15 @@ function Set-LogicMonSdt
 
         # SDT Duration
         [Parameter(
-            Mandatory, 
+            Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
         [int]$Duration,
-        
+
         # Why are you putting this device into SDT?
         [Parameter(
-            Mandatory, 
+            Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
@@ -56,7 +56,7 @@ function Set-LogicMonSdt
 
         # Type of SDT this will be
         [Parameter(
-            Mandatory, 
+            Mandatory,
             ValueFromPipeline,
             ValueFromPipelineByPropertyName
         )]
@@ -75,7 +75,7 @@ function Set-LogicMonSdt
         [string]$Company
     )
 
-    DynamicParam 
+    DynamicParam
     {
         if ($Type -eq 'DeviceEventSourceSDT')
         {
@@ -98,7 +98,7 @@ function Set-LogicMonSdt
     {
     }
     process
-    {        
+    {
         foreach ($server in $ComputerName)
         {
             if ($PSCmdlet.Shouldprocess("Scheduled Down Time for $server will be set to $Duration."))
@@ -114,15 +114,15 @@ function Set-LogicMonSdt
                 $server = $server.split('.')[0]
                 Write-Verbose "Defining account info for LogicMon."
                 $httpVerb = "POST"
-                
+
                 Write-Verbose "Getting current time in milliseconds."
-                $epoch = [Math]::Round((New-TimeSpan -start (Get-Date -Date "1/1/1970") -end (Get-Date).ToUniversalTime()).TotalMilliseconds)                                
+                $epoch = [Math]::Round((New-TimeSpan -start (Get-Date -Date "1/1/1970") -end (Get-Date).ToUniversalTime()).TotalMilliseconds)
                 $endDateTime = [Math]::Round((New-TimeSpan -start (Get-Date -Date "1/1/1970") -end (Get-Date).ToUniversalTime().AddHours($Duration)).TotalMilliseconds)
                 Write-Verbose "Building hash table to send to LogicMon."
                 $data = @{
                     sdtType       = 1
                     type          = $Type
-                    deviceId      = $($device.DeviceId)                    
+                    deviceId      = $($device.DeviceId)
                     comment       = $Comment
                     startDateTime = $epoch
                     endDateTime   = $endDateTime
@@ -159,8 +159,8 @@ function Set-LogicMonSdt
 
                 [PSCustomObject] @{
                     ServerName   = $server
-                    SDTScheduled = $responsePost.errmsg                    
-                }                
+                    SDTScheduled = $responsePost.errmsg
+                }
             }
         }
     }
